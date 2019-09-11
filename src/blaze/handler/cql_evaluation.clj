@@ -3,7 +3,7 @@
 
   https://github.com/DBCG/cql_execution_service"
   (:require
-    [cheshire.core :as json]
+    [jsonista.core :as json]
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [cognitect.anomalies :as anom]
@@ -33,6 +33,10 @@
   (or (Character/isLowerCase ^char (first type-name)) (= "Quantity" type-name)))
 
 
+(def ^:private object-mapper
+  (json/object-mapper {:pretty true}))
+
+
 (defn- bundle [{:keys [result type locator] :as full-result}]
   (case (:type type)
     "ListTypeSpecifier"
@@ -42,7 +46,7 @@
          :location (location locator)
          :resultType type-name}
         {:result
-         (json/generate-string
+         (json/write-value-as-string
            (into
              []
              (comp
@@ -50,8 +54,7 @@
                (map #(pull/pull-summary type-name %))
                (map #(assoc % :resourceType type-name)))
              result)
-           {:key-fn name
-            :pretty true})
+           object-mapper)
          :location (location locator)
          :resultType "Bundle"}))
     "NamedTypeSpecifier"

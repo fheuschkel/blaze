@@ -121,13 +121,3 @@
   (println (:body (prom/dump-metrics)))
 
   )
-
-;; Extract Codes from Code System
-(comment
-  (mapcat
-    (fn [{:strs [code concept]}]
-      (if concept
-        (cons code (map #(get % "code") concept))
-        [code]))
-    (cheshire.core/parse-string ""))
-  )

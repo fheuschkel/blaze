@@ -17,7 +17,7 @@
      io.netty/netty-transport
      io.netty/netty-transport-native-epoll]]
    [camel-snake-kebab "0.4.0"]
-   [cheshire "5.9.0"]
+   [metosin/jsonista "0.2.4"]
    [com.cognitect/anomalies "0.1.12"]
    [com.datomic/datomic-free "0.9.5697"
     :exclusions [io.netty/netty-all]]
@@ -30,7 +30,8 @@
      info.cqframework/qdm
      junit
      xpp3
-     xpp3/xpp3_xpath]]
+     xpp3/xpp3_xpath
+     com.fasterxml.jackson.core/jackson-core]]
    [integrant "0.7.0"]
    [io.netty/netty-codec-http "4.1.39.Final"]
    [io.netty/netty-handler-proxy "4.1.39.Final"]
@@ -54,8 +55,9 @@
    [phrase "0.3-alpha3"]
    [prom-metrics "0.5-alpha2"]
    [ring/ring-core "1.7.1"
-    :exclusions [clj-time commons-codec commons-fileupload
-                 commons-io crypto-equality crypto-random]]
+    :exclusions
+    [clj-time commons-codec commons-fileupload
+     commons-io crypto-equality crypto-random]]
    [systems.uom/systems-ucum "0.9"]
    [systems.uom/systems-quantity "1.0"]
 

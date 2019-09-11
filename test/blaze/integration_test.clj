@@ -1,6 +1,6 @@
 (ns blaze.integration-test
   (:require
-    [cheshire.core :as json]
+    [jsonista.core :as json]
     [clojure.spec.test.alpha :as st]
     [clojure.test :refer :all]
     [datomic.api :as d]
@@ -51,9 +51,13 @@
                        (compiler/compile-library db (cql/translate query) {})))
 
 
+(def ^:private object-mapper
+  (json/object-mapper {:bigdecimals true}))
+
+
 (defn read-data [query-name]
   (-> (slurp (str "integration-test/" query-name "/data.json"))
-      (json/parse-string)))
+      (json/read-value object-mapper)))
 
 
 (defn read-query [query-name]

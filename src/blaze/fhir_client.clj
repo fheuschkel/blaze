@@ -1,8 +1,7 @@
 (ns blaze.fhir-client
   (:require
     [aleph.http :as http]
-    [cheshire.core :as json]
-    [clojure.java.io :as io]
+    [jsonista.core :as json]
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [cognitect.anomalies :as anom]
@@ -13,9 +12,12 @@
 
 ;; ---- Middleware ------------------------------------------------------------
 
+(def ^:private object-mapper
+  (json/object-mapper {:decode-key-fn keyword :bigdecimals true}))
+
+
 (defn- parse-body [body]
-  (with-open [reader (io/reader body)]
-    (json/parse-stream reader keyword)))
+  (json/read-value body object-mapper))
 
 
 (defn- wrap-parse-body [client]

@@ -1,8 +1,7 @@
 (ns blaze.cql-translator
   (:require
     [blaze.elm.spec]
-    [cheshire.core :as json]
-    [cheshire.parse :refer [*use-bigdecimals?*]]
+    [jsonista.core :as json]
     [clojure.java.io :as io]
     [clojure.spec.alpha :as s]
     [cognitect.anomalies :as anom])
@@ -39,6 +38,10 @@
 (load-model-info "blaze/fhir-modelinfo-4.0.0.xml")
 
 
+(def ^:private object-mapper
+  (json/object-mapper {:decode-key-fn keyword :bigdecimals true}))
+
+
 (s/fdef translate
   :args (s/cat :cql string? :opts (s/* some?))
   :ret :elm/library)
@@ -54,5 +57,4 @@
        :cql cql
        :errors errors}
       (:library
-        (binding [*use-bigdecimals?* true]
-          (json/parse-string (.toJson translator) keyword))))))
+        (json/read-value (.toJson translator) object-mapper)))))

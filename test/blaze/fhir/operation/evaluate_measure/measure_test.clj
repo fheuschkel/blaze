@@ -8,8 +8,7 @@
     [blaze.fhir.operation.evaluate-measure.cql :as cql]
     [blaze.fhir.operation.evaluate-measure.measure :refer :all]
     [blaze.terminology-service.extern :as ts]
-    [cheshire.core :as json]
-    [cheshire.parse :refer [*use-bigdecimals?*]]
+    [jsonista.core :as json]
     [clojure.spec.alpha :as s]
     [clojure.spec.test.alpha :as st]
     [clojure.test :refer :all]
@@ -198,9 +197,13 @@
     "url" "Library/0"}})
 
 
+(def ^:private object-mapper
+  (json/object-mapper {:bigdecimals true}))
+
+
 (defn- read-data [name]
   (let [raw (slurp-resource (str name "-data.json"))
-        bundle (binding [*use-bigdecimals?* true] (json/parse-string raw))
+        bundle (json/read-value raw object-mapper)
         library (library (slurp-resource (str name "-query.cql")))]
     (update bundle "entry" conj library)))
 

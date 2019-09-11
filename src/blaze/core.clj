@@ -7,6 +7,8 @@
     [phrase.alpha :refer [defphraser phrase-first]]
     [spec-coerce.alpha :refer [coerce]]
     [taoensso.timbre :as log])
+  (:import
+    [io.netty.channel.epoll Epoll])
   (:gen-class))
 
 
@@ -48,7 +50,11 @@
         (init-system! coerced-config)
         (log/info "JVM version:" (System/getProperty "java.version"))
         (log/info "Maximum available memory:" (max-memory) "MiB")
-        (log/info "Number of available processors:" (available-processors)))
+        (log/info "Number of available processors:" (available-processors))
+        (if (Epoll/isAvailable)
+          (log/info "Epoll available: true")
+          (log/info "Epoll available: false, reason:"
+                    (ex-message (Epoll/unavailabilityCause)))))
       (log/error (phrase-first nil :system/config config)))))
 
 

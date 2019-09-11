@@ -1,9 +1,7 @@
 (ns blaze.middleware.json
   (:require
     [blaze.handler.util :as handler-util]
-    [cheshire.core :as json]
-    [cheshire.parse :refer [*use-bigdecimals?*]]
-    [clojure.java.io :as io]
+    [jsonista.core :as json]
     [cognitect.anomalies :as anom]
     [manifold.deferred :as md]
     [prometheus.alpha :as prom]
@@ -26,6 +24,10 @@
   "format")
 
 
+(def ^:private object-mapper
+  (json/object-mapper {:bigdecimals true}))
+
+
 (defn- parse-json
   "Takes a request `body` and returns a deferred with the parsed JSON content
   with string keys and BigDecimal numbers.
@@ -35,15 +37,13 @@
 
   Returns an error deferred with an incorrect anomaly on parse errors."
   [body]
-  (with-open [_ (prom/timer parse-duration-seconds "json")
-              reader (io/reader body)]
-    (binding [*use-bigdecimals?* true]
-      (try
-        (json/parse-stream reader)
-        (catch Exception e
-          (md/error-deferred
-            #::anom{:category ::anom/incorrect
-                    :message (ex-message e)}))))))
+  (with-open [_ (prom/timer parse-duration-seconds "json")]
+    (try
+      (json/read-value body object-mapper)
+      (catch Exception e
+        (md/error-deferred
+          #::anom{:category ::anom/incorrect
+                  :message (ex-message e)})))))
 
 
 (defn- handle-request
@@ -60,15 +60,16 @@
 (defn- generate-json [body]
   (try
     (with-open [_ (prom/timer generate-duration-seconds "json")]
-      (json/generate-string body {:key-fn name}))
+      (json/write-value-as-bytes body object-mapper))
     (catch Exception e
       (log/error (log/stacktrace e))
-      (json/generate-string
+      (json/write-value-as-bytes
         {"resourceType" "OperationOutcome"
          "issue"
          [{"severity" "error"
            "code" "exception"
-           "diagnostics" (ex-message e)}]}))))
+           "diagnostics" (ex-message e)}]}
+        object-mapper))))
 
 
 (defn handle-response [{:keys [body] :as response}]
