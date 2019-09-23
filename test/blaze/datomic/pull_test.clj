@@ -30,18 +30,17 @@
   (testing "meta.versionId"
     (let [[db] (with-resource db "Patient" "0")]
       (given (pull-resource db "Patient" "0")
-        ;; this is the t of the last transaction. it could change if the
-        ;; transactions before change
-        ["meta" "versionId"] := "9838")))
+        ["meta" "versionId"] :? string?)))
 
   (testing "meta.lastUpdated"
     (let [[db] (with-resource db "Patient" "0")]
-      (is (string? (get-in (pull-resource db "Patient" "0") ["meta" "lastUpdated"])))))
+      (given (pull-resource db "Patient" "0")
+        ["meta" "lastUpdated"] :? string?)))
 
   (testing "deleted"
     (let [[db] (with-deleted-resource db "Patient" "0")]
       (given (meta (pull-resource db "Patient" "0"))
-        :deleted := true)))
+        :deleted :? true?)))
 
   (testing "primitive single-valued single-typed element"
     (testing "with boolean type"

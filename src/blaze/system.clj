@@ -9,6 +9,7 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [blaze.bundle :as bundle]
+    [blaze.datomic.metrics :as datomic-metrics]
     [blaze.datomic.transaction :as tx]
     [blaze.datomic.schema :as schema]
     [blaze.executors :as ex]
@@ -96,7 +97,7 @@
 
 ;; ---- Functions -------------------------------------------------------------
 
-(def ^:private version "0.7.0-alpha3")
+(def ^:private version "0.7.0-feature.47.9")
 
 (def ^:private base-url "http://localhost:8080")
 
@@ -420,6 +421,10 @@
     (.register ts/request-duration-seconds)
     (.register evaluate-measure/compile-duration-seconds)
     (.register evaluate-measure/evaluate-duration-seconds)
+    (.register datomic-metrics/object-cache-hits-ratio)
+    (.register datomic-metrics/object-cache-size)
+    (.register datomic-metrics/storage-get-bytes-total)
+    (.register datomic-metrics/storage-gets-total)
     (.register (metrics/thread-pool-executor-collector
                  [["server" server-executor]
                   ["transaction-interaction" transaction-interaction-executor]
