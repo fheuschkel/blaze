@@ -146,6 +146,16 @@
     (update config :base-config merge (get storage (keyword key)))))
 
 
+(defn- deep-merge [& maps]
+  (apply merge-with (fn [& args]
+                      (if (every? #(or (map? %) (nil? %)) args)
+                        (apply deep-merge args)
+                        (if (every? (fn [x] (vector? x)) args)
+                          (vec (apply concat args))
+                          (last args))))
+         maps))
+
+
 (defn- merge-features
   "Merges feature config portions of enabled features into `base-config`."
   {:arglists '([blaze-edn env])}
@@ -155,10 +165,20 @@
       (let [enabled? (feature-enabled? env feature)]
         (log/info "Feature" name (if enabled? "enabled" "disabled"))
         (if enabled?
-          (merge res config)
+          (deep-merge res config)
           res)))
     base-config
     features))
+
+
+(comment
+  (let [config (-> (read-blaze-edn)
+                   (merge-storage (System/getenv))
+                   (merge-features (System/getenv)))
+        part_config (-> (read-blaze-edn)
+                        (merge-storage (System/getenv)))]
+    (str config)
+    (str part_config)))
 
 
 (defn init!

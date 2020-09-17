@@ -363,13 +363,14 @@
 (def default-handler
   (reitit.ring/create-default-handler
     {:not-found
-     (fn [_]
+     (fn [request]
        (ac/completed-future
          (ring/not-found
            {:resourceType "OperationOutcome"
             :issue
             [{:severity "error"
-              :code "not-found"}]})))
+              :code "not-found"
+              :request (str request)}]})))
      :method-not-allowed
      (fn [{:keys [uri request-method]}]
        (-> (ring/response

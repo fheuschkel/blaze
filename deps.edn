@@ -22,6 +22,9 @@
   blaze.operation/measure-evaluate-measure
   {:local/root "modules/operation-measure-evaluate-measure"}
 
+  blaze.operation/bulk-data-export
+  {:local/root "modules/operation-bulk-data-export"}
+
   blaze/openid-auth
   {:local/root "modules/openid-auth"}
 

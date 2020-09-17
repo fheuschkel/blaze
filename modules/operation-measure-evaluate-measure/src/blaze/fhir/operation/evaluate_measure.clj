@@ -19,8 +19,8 @@
 (set! *warn-on-reflection* true)
 
 
-(defn handler [clock conn executor]
-  (-> (impl/handler clock conn executor)
+(defn handler [clock node executor]
+  (-> (impl/handler clock node executor)
       (wrap-coerce-params)
       (wrap-params)
       (wrap-observe-request-duration "operation-evaluate-measure")))

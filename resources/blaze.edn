@@ -597,4 +597,31 @@
    :toggle "OPENID_PROVIDER_URL"
    :config
    {:blaze.openid-auth/backend
-    {:openid-provider/url #blaze/cfg ["OPENID_PROVIDER_URL" string?]}}}]}
+    {:openid-provider/url #blaze/cfg ["OPENID_PROVIDER_URL" string?]}}}
+
+
+  ;;
+  ;; Bulk Data Export
+  ;;
+  ;; Special operation which enables Blaze to export bulk data
+  ;;
+  ;;
+  {:name "Bulk Data Export"
+   :toggle "FEATURE_BULK_DATA_EXPORT"
+   :config
+   {:blaze/rest-api
+    {:operations
+     [#:blaze.rest-api.operation
+         {:code "export"
+          :def-uri "https://hl7.org/fhir/uv/bulkdata/"
+          :resource-types []
+          :system-handler #blaze/ref :blaze.fhir.operation.bulk-data-export/export-handler}
+      #:blaze.rest-api.operation
+          {:code "export-status"
+           :def-uri ""
+           :resource-types ["Task"]
+           :instance-handler #blaze/ref :blaze.fhir.operation.bulk-data-export/export-status-handler}]}
+    :blaze.fhir.operation.bulk-data-export/export-handler
+    {:node #blaze/ref :blaze.db/node}
+    :blaze.fhir.operation.bulk-data-export/export-status-handler
+    {:node #blaze/ref :blaze.db/node}}}]}
